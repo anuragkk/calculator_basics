@@ -1,46 +1,74 @@
-def add(n1, n2):
-    return n1 + n2
+import random
 
 
-def subtract(n1, n2):
-    return n1 - n2
+def deal_cards():
+    """Returns a random card from the deck."""
+    cards = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2]
+    return random.choice(cards)
 
 
-def multiply(n1, n2):
-    return n1 * n2
+def swap_cards(cards):
+    """Converts an Ace (11) to 1 if total is over 21."""
+    while sum(cards) > 21 and 11 in cards:
+        cards.remove(11)
+        cards.append(1)
 
 
-def division(n1, n2):
-    return n1 / n2
+def blackjack(cards):
+    """Checks if hand is a natural blackjack."""
+    return sum(cards) == 21 and len(cards) == 2
 
 
-operations = {
-    "+": add,
-    "-": subtract,
-    "*": multiply,
-    "/": division,
-}
+# Initial hands
+user_cards = [deal_cards(), deal_cards()]
+computer_cards = [deal_cards(), deal_cards()]
+
+swap_cards(user_cards)
+swap_cards(computer_cards)
+
+print(f"Here are your cards: {user_cards}")
+print(f"Computer's first card: {computer_cards[0]}")
 
 
-def calculator():
-    n1 = float(input("please enter the 1st number\n"))
-    continue_calculation = True
-    while continue_calculation:
-        for symbol in operations:
-            print(symbol)
-        operation = input("please select a symbol from above\n")
-        n2 = float(input("please input your 2nd number for calculation"))
-        answer = operations[operation](n1, n2)
-        print(f" your result is {answer}")
-        choice = input(f"please enter 'y' to continue with {answer}"
-                       f", 'n' to start a new calculation and 'e' to end").strip().lower()
+# Game function
+def game():
+    # Check starting blackjack cases
+    if blackjack(user_cards) and blackjack(computer_cards):
+        print(f"It's a draw! Your cards: {user_cards}, Computer's cards: {computer_cards}")
+        return
+    elif blackjack(user_cards):
+        print(f"You win! You hit blackjack. Your cards: {user_cards}")
+        return
+    elif blackjack(computer_cards):
+        print(f"You lose! Computer hits blackjack. Computer's cards: {computer_cards}")
+        return
+
+    # Player's turn
+    while True:
+        print(f"Your current hand: {user_cards}, current score: {sum(user_cards)}")
+        choice = input("Do you want to draw another card? (y/n): ").lower()
 
         if choice == "y":
-            n1 = answer
+            user_cards.append(deal_cards())
+            swap_cards(user_cards)
 
-        elif choice == "n":
-            n1 = float(input("please enter the 1st number\n"))
-
+            if sum(user_cards) > 21:
+                print(f"You went over 21. You lose! Your cards: {user_cards}")
+                return
         else:
-            print("Thanks for using the calculator!")
-            return
+            break
+
+    # Computer's turn — stays at 2 cards
+    print(f"Computer's cards: {computer_cards}, final score: {sum(computer_cards)}")
+
+    # Compare results
+    if sum(user_cards) > sum(computer_cards):
+        print("You win!")
+    elif sum(user_cards) < sum(computer_cards):
+        print("You lose!")
+    else:
+        print("It's a draw!")
+
+
+# Start game
+game()
